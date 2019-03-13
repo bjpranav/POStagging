@@ -5,6 +5,7 @@ from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+from nltk.stem.wordnet import WordNetLemmatizer
 """
 train=sys.argv[1]
 test=sys.argv[2]
@@ -70,7 +71,7 @@ for i in range(0,len(only_tags)-1):
         double_tag_count[mer]=1
 
 
-with open(test) as testset:
+#with open(test) as testset:
 with open(r"D:\bin\AIT-690\Assignments\Assignment-2\PA2\PA2\pos-test.txt") as testset:
 
     untagged_testset = testset.read()
@@ -118,11 +119,13 @@ def tagged_word(prev,curr):
                     if (n > max_val):
                         max_val = n
                         typeVal = u
+            
 
         prev = typeVal
         return prev,typeVal
 
 
+COUNT=0
 #bigram
 bigram=untagged_testset
 tagged_test_string=[]
@@ -136,6 +139,7 @@ for i in range(0,len(bigram)):
 
         if len(set(taggedDict[bigram[i]]))==1:
             typeVal=taggedDict[bigram[i]][0]
+            COUNT=COUNT+1
 
         elif i==0:
             prev='.'
@@ -153,7 +157,39 @@ for i in range(0,len(bigram)):
     tagged=bigram[i]+'/'+typeVal
     tagged_test_string.append(tagged)
 
+firstTag=tagged_test_string[0]
+prev = nltk.tag.str2tuple(firstTag)[1]
+Lem = WordNetLemmatizer()
 
+for i in range(0,(len(tagged_test_string)-2)):
+    currTag=nltk.tag.str2tuple(tagged_test_string[i])[1]
+    nextTag=nltk.tag.str2tuple(tagged_test_string[i+1])[1]
+    if(i>0):
+        prevTag=nltk.tag.str2tuple(tagged_test_string[i-1])[1]
+    currWord=nltk.tag.str2tuple(tagged_test_string[i])[0]
+    if(currWord == 'a' and prevTag not in [',','.',':']):
+        typeVal='DT'
+        tagged=bigram[i]+'/'+typeVal
+        tagged_test_string[i]=tagged
+        #print(tagged_test_string[i])
+    elif(currWord.istitle() and currTag == 'NN' and prevTag != '.'):
+        typeVal='NNP'
+        tagged=bigram[i]+'/'+typeVal
+        tagged_test_string[i]=tagged
+    elif(currWord.endswith('s') and Lem.lemmatize(currWord)==currWord[:-1] and currTag == 'NN'):
+        typeVal='NNS'
+        tagged=bigram[i]+'/'+typeVal
+        tagged_test_string[i]=tagged 
+    elif(currTag == 'RP' and prevTag not in ["VB","VBD","VBG","VBN","VBZ","VBP"]):
+        typeVal='IN'
+        tagged=bigram[i]+'/'+typeVal
+        tagged_test_string[i]=tagged 
+    elif(currTag == 'NN' and currWord.replace('.','',1).isdigit()):
+        typeVal='CD'
+        tagged=bigram[i]+'/'+typeVal
+        tagged_test_string[i]=tagged 
+
+    
 
 
 
@@ -162,7 +198,7 @@ for i in range(0,len(bigram)):
 tagged_testset_key=r"No/RB ,/, [ it/PRP ][ was/VBD n't/RB Black/NNP Monday/NNP ]./. But/CC while/IN [ the/DT New/NNP York/NNP Stock/NNP Exchange/NNP ]did/VBD n't/RB [ fall/VB ]apart/RB [ Friday/NNP ]as/IN [ the/DT Dow/NNP Jones/NNP Industrial/NNP Average/NNP ]plunged/VBD [ 190.58/CD points/NNS ]--/: most/JJS of/IN [ it/PRP ]in/IN [ the/DT final/JJ hour/NN "
 """
 
-with open(key) as testset_key:
+#with open(key) as testset_key:
 with open(r"D:\bin\AIT-690\Assignments\Assignment-2\PA2\PA2\pos-test-key.txt") as testset_key:
 
     tagged_testset_key = testset_key.read()
@@ -187,6 +223,8 @@ for i in range(0,len(predicted)):
             confusion_matrix.at[predicted[i], actual[i]]=confusion_matrix.at[predicted[i], actual[i]] + 1
         else:
             confusion_matrix.at[predicted[i], actual[i]]=confusion_matrix.at[predicted[i], actual[i]] + 1
+            if(actual[i]=="NN" and predicted[i]=="CD"):
+                print(tagged_test_string[i-1],tagged_test_string[i])
 
 
 accuracy=(cnt*100)/len(predicted)
@@ -196,4 +234,4 @@ print(accuracy)
 
 #confusion_matrix(actual,predicted)
 
-cnf_matrix = confusion_matrix(actual,predicted)
+#cnf_matrix = confusion_matrix(actual,predicted)
