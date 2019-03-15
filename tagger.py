@@ -6,6 +6,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from nltk.stem.wordnet import WordNetLemmatizer
+
+
+
+
+
+
 """
 train=sys.argv[1]
 test=sys.argv[2]
@@ -14,25 +20,25 @@ key=sys.argv[3]
 
 
 
-with open(r"D:\bin\AIT-690\Assignments\Assignment-2\PA2\PA2\pos-train.txt") as trainset:
-    tagged_trainset = trainset.read()
-    # removing "[,],\n" which are not needed
-    tagged_trainset=tagged_trainset.replace("[","")
-    tagged_trainset=tagged_trainset.replace("]","")
-    tagged_trainset = tagged_trainset.replace("\n", "")
-    
-    only_tags = []
-    taggedList = []
-    for line in tagged_trainset.split():
-        tagTuples = nltk.tag.str2tuple(line)
-        if (tagTuples[1] != None):
-            if("|" in list(tagTuples[1])):
-                print("inside")
-                tagTuples=(tagTuples[0],tagTuples[1].split('|')[0])
-            taggedList.append(tagTuples)
-            only_tags.append(tagTuples[1])
+#trainset = open(train)
+trainset = open(r"C:\Users\alaga\Desktop\sem 2\AIT690\POStagging\pos-train.txt")
 
+tagged_trainset = trainset.read()
+# removing "[,],\n" which are not needed
+tagged_trainset = tagged_trainset.replace("[", "")
+tagged_trainset = tagged_trainset.replace("]", "")
+tagged_trainset = tagged_trainset.replace("\n", "")
 
+only_tags = []
+taggedList = []
+for line in tagged_trainset.split():
+    tagTuples = nltk.tag.str2tuple(line)
+    if (tagTuples[1] != None):
+        if ("|" in list(tagTuples[1])):
+
+            tagTuples = (tagTuples[0], tagTuples[1].split('|')[0])
+        taggedList.append(tagTuples)
+        only_tags.append(tagTuples[1])
 
 taggedDict={}
 for x,y in taggedList:
@@ -61,24 +67,15 @@ for i in range(0,len(only_tags)-1):
 
 
 
-double_tag_count={}
-mer=''
-for i in range(0,len(only_tags)-1):
-    mer=only_tags[i]+' '+only_tags[i+1]
-    if mer in double_tag_count.keys():
-        double_tag_count[mer]=double_tag_count[mer]+1
-    else:
-        double_tag_count[mer]=1
+#testset = open(test)
+testset=open(r"C:\Users\alaga\Desktop\sem 2\AIT690\POStagging\pos-test.txt")
 
+untagged_testset = testset.read()
+# TEXT cleaning, removing "[,],\n"
+untagged_testset = untagged_testset.replace("[", "")
+untagged_testset = untagged_testset.replace("]", "")
+untagged_testset = untagged_testset.replace("\n", "")
 
-#with open(test) as testset:
-with open(r"D:\bin\AIT-690\Assignments\Assignment-2\PA2\PA2\pos-test.txt") as testset:
-
-    untagged_testset = testset.read()
-    # TEXT cleaning, removing "[,],\n"
-    untagged_testset=untagged_testset.replace("[","")
-    untagged_testset=untagged_testset.replace("]","")
-    untagged_testset = untagged_testset.replace("\n", "")
 
 """"
 untagged_testset="No ,  it  was n't Black Monday . But while  the New York Stock Exchange did n't  fall apart  Friday as  the Dow Jones Industrial Average plunged  190.58 points -- most of  it in  the final hour "
@@ -126,7 +123,6 @@ def tagged_word(prev,curr):
 
 
 COUNT=0
-#bigram
 bigram=untagged_testset
 tagged_test_string=[]
 tagged=''
@@ -161,6 +157,8 @@ firstTag=tagged_test_string[0]
 prev = nltk.tag.str2tuple(firstTag)[1]
 Lem = WordNetLemmatizer()
 
+#nltk.download('wordnet')
+
 for i in range(0,(len(tagged_test_string)-2)):
     currTag=nltk.tag.str2tuple(tagged_test_string[i])[1]
     nextTag=nltk.tag.str2tuple(tagged_test_string[i+1])[1]
@@ -179,59 +177,22 @@ for i in range(0,(len(tagged_test_string)-2)):
     elif(currWord.endswith('s') and Lem.lemmatize(currWord)==currWord[:-1] and currTag == 'NN'):
         typeVal='NNS'
         tagged=bigram[i]+'/'+typeVal
-        tagged_test_string[i]=tagged 
     elif(currTag == 'RP' and prevTag not in ["VB","VBD","VBG","VBN","VBZ","VBP"]):
         typeVal='IN'
         tagged=bigram[i]+'/'+typeVal
-        tagged_test_string[i]=tagged 
+        tagged_test_string[i]=tagged
     elif(currTag == 'NN' and currWord.replace('.','',1).isdigit()):
         typeVal='CD'
         tagged=bigram[i]+'/'+typeVal
-        tagged_test_string[i]=tagged 
-
-    
+        tagged_test_string[i]=tagged
 
 
 
 
-"""
-tagged_testset_key=r"No/RB ,/, [ it/PRP ][ was/VBD n't/RB Black/NNP Monday/NNP ]./. But/CC while/IN [ the/DT New/NNP York/NNP Stock/NNP Exchange/NNP ]did/VBD n't/RB [ fall/VB ]apart/RB [ Friday/NNP ]as/IN [ the/DT Dow/NNP Jones/NNP Industrial/NNP Average/NNP ]plunged/VBD [ 190.58/CD points/NNS ]--/: most/JJS of/IN [ it/PRP ]in/IN [ the/DT final/JJ hour/NN "
-"""
-
-#with open(key) as testset_key:
-with open(r"D:\bin\AIT-690\Assignments\Assignment-2\PA2\PA2\pos-test-key.txt") as testset_key:
-
-    tagged_testset_key = testset_key.read()
-    ## TEXT cleaning, removing "[,],\n"
-    tagged_testset_key = tagged_testset_key .replace("[", "")
-    tagged_testset_key = tagged_testset_key .replace("]", "")
-    tagged_testset_key= tagged_testset_key .replace("\n", "")
-
-tags=list(single_tag_count.keys())
-A = np.zeros((len(tags), len(tags)))
-
-confusion_matrix = pd.DataFrame(A, index=tags, columns=tags)
-
-predicted=extract_tags(tagged_test_string)
-actual=extract_tags(tagged_testset_key.split())
-
-cnt=0
-for i in range(0,len(predicted)):
-    if(actual[i] in single_tag_count.keys()):
-        if(predicted[i]==actual[i]):
-            cnt+=1
-            confusion_matrix.at[predicted[i], actual[i]]=confusion_matrix.at[predicted[i], actual[i]] + 1
-        else:
-            confusion_matrix.at[predicted[i], actual[i]]=confusion_matrix.at[predicted[i], actual[i]] + 1
-            if(actual[i]=="NN" and predicted[i]=="CD"):
-                print(tagged_test_string[i-1],tagged_test_string[i])
+with open('pos-test-with-tags.txt', 'w') as f:
+    for item in tagged_test_string:
+        f.write("%s\n" % item)
 
 
-accuracy=(cnt*100)/len(predicted)
-
-print(accuracy)
 
 
-#confusion_matrix(actual,predicted)
-
-#cnf_matrix = confusion_matrix(actual,predicted)
