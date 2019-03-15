@@ -8,17 +8,10 @@ import numpy as np
 from nltk.stem.wordnet import WordNetLemmatizer
 
 
-
-
-
-
 """
 train=sys.argv[1]
 test=sys.argv[2]
-key=sys.argv[3]
 """
-
-
 
 #trainset = open(train)
 trainset = open(r"C:\Users\alaga\Desktop\sem 2\AIT690\POStagging\pos-train.txt")
