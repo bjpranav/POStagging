@@ -1,7 +1,14 @@
+# -*- coding: utf-8 -*-
+
+
 
 import sys
 import nltk
+import os
+import numpy as np
+import pandas as pd
 
+os.chdir(r'D:\bin\AIT-690\Assignments\Assignment-2')
 #accuracy test
 
 predicted=sys.argv[1]
@@ -30,17 +37,29 @@ tagged_testset_key= tagged_testset_key .replace("\n", "")
 #testset = open(r"C:\Users\alaga\Desktop\sem 2\AIT690\POStagging\pos-test-key.txt")
 
 
-
+#tags=list(single_tag_count.keys())
 predicted=extract_tags(predicted.split())
 actual=extract_tags(tagged_testset_key.split())
+
+tags=set(actual)
+
+A = np.zeros((len(tags), len(tags)))
+confusion_matrix = pd.DataFrame(A, index=tags, columns=tags)
 
 
 cnt=0
 for i in range(0,len(predicted)):
     if predicted[i]==actual[i]:
         cnt+=1
-
+    confusion_matrix.at[predicted[i], actual[i]]=confusion_matrix.at[predicted[i], actual[i]] + 1
 
 accuracy=(cnt*100)/len(predicted)
 
 print(accuracy)
+print(confusion_matrix)
+
+with open('pos-tagging-report.txt', 'w') as f:
+#np.savetxt(r'pos-tagging-report.txt', confusion_matrix, fmt='%d',delimiter = "   ")
+    f.write("Accuracy: %s" % accuracy+"\n")
+    confusion_matrix.to_csv('pos-tagging-report.txt', header=True, index=True, sep='\t', mode='a')
+    
