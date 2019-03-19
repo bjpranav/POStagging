@@ -66,10 +66,13 @@ for i in range(0,len(predicted)):
 
 accuracy=(cnt*100)/len(predicted)
 
+    
 with open('pos-tagging-report.txt', 'w') as f:
 #np.savetxt(r'pos-tagging-report.txt', confusion_matrix, fmt='%d',delimiter = "   ")
     f.write("Accuracy: %s" % accuracy+"\n")
-    confusion_matrix.to_csv('pos-tagging-report.txt', header=True, index=True, sep='\t', mode='a')
+    f.write(confusion_matrix.to_string())
+    
+#print("pos-tagging-report.txt")
     
 print("pos-tagging-report.txt")
 print(accuracy)
