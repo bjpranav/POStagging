@@ -3,9 +3,9 @@
 POS tagger by Team GAP
 Team Members: Pranav Krishna SJ,Alagappan A, Ganesh Nalluru
 
-This program learns to tag words based on the given train set which consists of tagged words
-and tag words in the test set, generating a text file "pos-test-with-tags.txt" consisting of tagged 
-test words.
+This program learns to tag words based on the given train set which consists of tagged words and the
+learning is tested on a test set without tags, finally generating a text file "pos-test-with-tags.txt"
+consisting of tagged test words.
 
 Accuracy:
     Baseline:
