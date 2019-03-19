@@ -59,12 +59,11 @@ import sys
 
 
 # arguments from command line are stored as train and test
-#train=sys.argv[1]
-#test=sys.argv[2]
+train=sys.argv[1]
+test=sys.argv[2]
 
 # opening argument 1(pos-train.txt) and storing it as trainset
-#trainset = open(train)
-trainset = open(r"D:\bin\AIT-690\Assignments\Assignment-2\pos-train.txt")
+trainset = open(train)
 
 # reading the train set as tagged_trainset
 tagged_trainset = trainset.read()
@@ -73,7 +72,6 @@ tagged_trainset = trainset.read()
 tagged_trainset = tagged_trainset.replace("[", "")
 tagged_trainset = tagged_trainset.replace("]", "")
 tagged_trainset = tagged_trainset.replace("\n", "")
-
 
 # extacting tags from the give tagged trainset
 only_tags = []
@@ -117,8 +115,7 @@ for i in range(0,len(only_tags)):
             double_tag_count[mer] = 1
 
 # opening argument 2(pos-test.txt) and storing it as testset
-#testset = open(test)
-testset=open(r"D:\bin\AIT-690\Assignments\Assignment-2\pos-test.txt")
+testset = open(test)
 #reading the testset as untagged_testset
 untagged_testset = testset.read()
 
@@ -134,7 +131,7 @@ def setz(sequence):
 
 # function to calculate the probability of tag based on the prev tag and the current word
 # returns the tag of the particular word based on the calculated probability
-#Parameters: Previous tag and current word
+# Parameters: Previous tag and current word
 def tagged_word(prev,curr):
     max_prob = []
     # if the word exists in the taggedDict, enters..
@@ -236,7 +233,7 @@ for i in range(0,len(bigram)):
     tagged_test_string.append(tagged)
 
 
-#Set of rules after analyzing confusion matrix 
+# Set of rules after analyzing confusion matrix
 for i in range(0,(len(tagged_test_string)-2)):
     currTag=nltk.tag.str2tuple(tagged_test_string[i])[1]
     nextTag=nltk.tag.str2tuple(tagged_test_string[i+1])[1]
@@ -244,31 +241,31 @@ for i in range(0,(len(tagged_test_string)-2)):
         prevTag=nltk.tag.str2tuple(tagged_test_string[i-1])[1]
     currWord=nltk.tag.str2tuple(tagged_test_string[i])[0]
     
-    #If the word is "a" and if the previous tags for the word does not denote
-    #end of sentences, then that word is a determiner.
+    # If the word is "a" and if the previous tags for the word does not denote
+    # end of sentences, then that word is a determiner.
     
     if(currWord == 'a' and prevTag not in [',','.',':']):
         typeVal='DT'
         tagged=bigram[i]+'/'+typeVal
         tagged_test_string[i]=tagged
     
-    #If the word is currently tagged as particle and if the word is not after different
-    #forms of verb then the word should be tagged as preposition or  subordinating conjunction.
+    # If the word is currently tagged as particle and if the word is not after different
+    # forms of verb then the word should be tagged as preposition or  subordinating conjunction.
     
     elif(currTag == 'RP' and prevTag not in ["VB","VBD","VBG","VBN","VBZ","VBP"]):
         typeVal='IN'
         tagged=bigram[i]+'/'+typeVal
         tagged_test_string[i]=tagged
-    #If the word is currently tagged as verb and if the previous tag is determiner,
-    #then the word should be tagged as noun.
+    # If the word is currently tagged as verb and if the previous tag is determiner,
+    # then the word should be tagged as noun.
                
     elif(currTag == 'VB' and prevTag == "DT"):
         typeVal='NN'
         tagged=bigram[i]+'/'+typeVal
         tagged_test_string[i]=tagged
     
-    #If the word is currently tagged as Wh-determiner and if the previous tag is not
-    #a noun then the word should be a preposition or  subordinating conjunction.
+    # If the word is currently tagged as Wh-determiner and if the previous tag is not
+    # a noun then the word should be a preposition or  subordinating conjunction.
           
     elif(currTag == 'WDT' and prevTag not in ["NN","NNS",',']):
         typeVal='IN'
@@ -276,7 +273,7 @@ for i in range(0,(len(tagged_test_string)-2)):
         tagged_test_string[i]=tagged
  
 # writing the tagged_test_string to a text file
-with open(r'D:\bin\AIT-690\Assignments\Assignment-2\pos-test-with-tags.txt', 'w') as f:
+with open(r'pos-test-with-tags.txt', 'w') as f:
     for item in tagged_test_string:
         f.write("%s\n" % item)
 
