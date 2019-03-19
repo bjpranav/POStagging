@@ -1,5 +1,20 @@
 # Team Gap
+'''
+POS tagger by Team GAP
+Team Members: Pranav Krishna SJ,Alagappan A, Ganesh Nalluru
 
+Accuracy:
+    If we consider baseline as assigning each word to the most frequent POS tag
+    in the document,that is, tagging each word as nouns, the accuracy on the test file 
+    is around 13.3%.
+    
+    If we consider baseline as assigning each word to the most frequent POS tag,
+    that is tagging each word as nouns, the accuracy is around 13.3%
+The tagger program 
+Algorithm:
+    Requests train and test sets from the user
+    
+'''
 # Import packages
 import nltk
 import sys
