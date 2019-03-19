@@ -1,4 +1,3 @@
-#Team GAP
 import nltk
 import sys
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -11,7 +10,7 @@ import time
 
 start = time.time()
 #trainset = open(train)
-trainset = open(r"C:\Users\alaga\Desktop\sem 2\AIT690\POStag\pos-train.txt")
+trainset = open(r"D:\bin\AIT-690\Assignments\Assignment-2\pos-train.txt")
 tagged_trainset = trainset.read()
 
 # removing "[,],\n" which are not needed
@@ -55,7 +54,7 @@ for i in range(0,len(only_tags)):
 
 
 #testset = open(test)
-testset=open(r"C:\Users\alaga\Desktop\sem 2\AIT690\POStagging\pos-test.txt")
+testset=open(r"D:\bin\AIT-690\Assignments\Assignment-2\\pos-test.txt")
 untagged_testset = testset.read()
 
 # TEXT cleaning, removing "[,],\n"
@@ -128,12 +127,23 @@ for i in range(0,len(bigram)):
             typeVal = "JJ"
         elif bigram[i][0].isupper()==True:
             typeVal = "NNP"
+        elif bigram[i][-3:] == 'ing':
+            typeVal = "VBG"
         else:
-            typeVal = "NNP"
+            typeVal = "NN"
         prev=typeVal
 
     tagged=bigram[i]+'/'+typeVal
     tagged_test_string.append(tagged)
+
+'''
+for i in range(0,(len(tagged_test_string)-2)):
+    currTag=nltk.tag.str2tuple(tagged_test_string[i])[1]
+    nextTag=nltk.tag.str2tuple(tagged_test_string[i+1])[1]
+    if(i>0):
+        prevTag=nltk.tag.str2tuple(tagged_test_string[i-1])[1]
+    currWord=nltk.tag.str2tuple(tagged_test_string[i])[0]
+'''
 
 for i in range(0,(len(tagged_test_string)-2)):
     currTag=nltk.tag.str2tuple(tagged_test_string[i])[1]
@@ -141,27 +151,31 @@ for i in range(0,(len(tagged_test_string)-2)):
     if(i>0):
         prevTag=nltk.tag.str2tuple(tagged_test_string[i-1])[1]
     currWord=nltk.tag.str2tuple(tagged_test_string[i])[0]
+    
     if(currWord == 'a' and prevTag not in [',','.',':']):
         typeVal='DT'
         tagged=bigram[i]+'/'+typeVal
         tagged_test_string[i]=tagged
-        #print(tagged_test_string[i])
-    elif(currWord.istitle() and currTag == 'NN' and prevTag != '.'):
-        typeVal='NNP'
-        tagged=bigram[i]+'/'+typeVal
-        tagged_test_string[i]=tagged
-    elif(currWord.endswith('s') and Lem.lemmatize(currWord)==currWord[:-1] and currTag == 'NN'):
-        typeVal='NNS'
-        tagged=bigram[i]+'/'+typeVal
+
     elif(currTag == 'RP' and prevTag not in ["VB","VBD","VBG","VBN","VBZ","VBP"]):
         typeVal='IN'
         tagged=bigram[i]+'/'+typeVal
         tagged_test_string[i]=tagged
-    elif(currTag == 'NN' and currWord.replace('.','',1).isdigit()):
-        typeVal='CD'
+        
+    elif(currTag == 'RP' and prevTag not in ["VB","VBD","VBG","VBN","VBZ","VBP"]):
+        typeVal='IN'
         tagged=bigram[i]+'/'+typeVal
         tagged_test_string[i]=tagged
-
+        
+    elif(currTag == 'VB' and prevTag == "DT"):
+        typeVal='NN'
+        tagged=bigram[i]+'/'+typeVal
+        tagged_test_string[i]=tagged
+    elif(currTag == 'WDT' and prevTag not in ["NN","NNS",',']):
+        typeVal='IN'
+        tagged=bigram[i]+'/'+typeVal
+        tagged_test_string[i]=tagged
+ 
 
 with open('pos-test-with-tags.txt', 'w') as f:
     for item in tagged_test_string:
@@ -171,4 +185,3 @@ end = time.time()
 runtime = end-start
 print("Run Time: ",runtime)
 print("pos-test-with-tags.txt")
-
