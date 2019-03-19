@@ -4,15 +4,53 @@ POS tagger by Team GAP
 Team Members: Pranav Krishna SJ,Alagappan A, Ganesh Nalluru
 
 Accuracy:
-    If we consider baseline as assigning each word to the most frequent POS tag
-    in the document,that is, tagging each word as nouns, the accuracy on the test file 
-    is around 13.3%.
+    Baseline:
+        If we consider baseline as assigning each word to the most frequent POS tag
+        for the word, then the accuracy is around 82.3%.
+    Bigram:
+        The HMM POS tagger using a bigram model improved the accuracy from 82.3%
+        to 83.1%
+    Rules:
+        Adding rules to the bigram HMM tagger improves the accuracy by 7%. The
+        accuracy after creating rules by analyzing confusion matrix is 90.1%.
+Rules:
+    The set of rules used in this tagger are as follows,
     
-    If we consider baseline as assigning each word to the most frequent POS tag,
-    that is tagging each word as nouns, the accuracy is around 13.3%
-The tagger program 
+    If the word is "a" and if the previous tags for the word does not denote
+    end of sentences, then that word is a determiner.
+    
+    If the word is currently tagged as particle and if the word is not after different
+    forms of verb then the word should be tagged as preposition or  subordinating conjunction.
+    
+    If the word is currently tagged as verb and if the previous tag is determiner,
+    then the word should be tagged as noun.
+               
+    If the word is currently tagged as Wh-determiner and if the previous tag is not
+    a noun then the word should be a preposition or  subordinating conjunction.
+    
+    If the word ends with "ing" then it is a gerund verb.
+    
+    If the first letter of the word is capitalized then it is a proper noun.
+    
+    If the word ends with 'able' then it is an adjective.
+          
+
+The algorithm for the tagger program is as follows.
 Algorithm:
-    Requests train and test sets from the user
+    Requests train and test files from the user.
+    Extracts tags and count of each tag in the training file.
+    Extracts words and list of tags for the word in the training set.
+    Extracts bigrams of tags and count of the bigram in the training set.
+    For each word in the test file:
+        For each tag of the word in training file:
+            Computes the probability of word given the tag. i.e, p(w|t)
+            Computes the probability of tag given the previous tag.i.e, p(t|t-1)
+            Multiples both these tags.
+        Finds the tag with maximum probability and assigns it to to the word.
+    A set of rules written after the analyzing the confusion matrix transforms the tags assigned.
+    
+        
+    
     
 '''
 # Import packages
@@ -26,7 +64,7 @@ import sys
 
 # opening argument 1(pos-train.txt) and storing it as trainset
 #trainset = open(train)
-trainset = open(r"C:\Users\alaga\Desktop\sem 2\AIT690\POStag\pos-train.txt")
+trainset = open(r"D:\bin\AIT-690\Assignments\Assignment-2\pos-train.txt")
 
 # reading the train set as tagged_trainset
 tagged_trainset = trainset.read()
@@ -80,7 +118,7 @@ for i in range(0,len(only_tags)):
 
 # opening argument 2(pos-test.txt) and storing it as testset
 #testset = open(test)
-testset=open(r"C:\Users\alaga\Desktop\sem 2\AIT690\POStag\pos-test.txt")
+testset=open(r"D:\bin\AIT-690\Assignments\Assignment-2\pos-test.txt")
 #reading the testset as untagged_testset
 untagged_testset = testset.read()
 
@@ -96,6 +134,7 @@ def setz(sequence):
 
 # function to calculate the probability of tag based on the prev tag and the current word
 # returns the tag of the particular word based on the calculated probability
+#Parameters: Previous tag and current word
 def tagged_word(prev,curr):
     max_prob = []
     # if the word exists in the taggedDict, enters..
@@ -114,7 +153,7 @@ def tagged_word(prev,curr):
             # check if merged tag is in the double_tag_count dictionary
             if mer in double_tag_count.keys():
                 # probability is count of merged tags by total number if occurrence of the selected tag
-                prob2 = double_tag_count[mer] / single_tag_count[u]
+                prob2 = double_tag_count[mer] / single_tag_count[prev]
                 total_prob = prob1 * prob2
                 # a list is maintained to store the probabilities
                 max_prob.append(total_prob)
@@ -174,6 +213,7 @@ for i in range(0,len(bigram)):
 
     # rules for unseen word
     else:
+        
         if bigram[i][0].isdigit()==True:
             typeVal = "CD"
         elif bigram[i][-1]=='s':
@@ -186,7 +226,7 @@ for i in range(0,len(bigram)):
             typeVal = "NNP"
         elif bigram[i][-3:] == 'ing':
             typeVal = "VBG"
-        else:
+        else: 
             typeVal = "NN"
         prev=typeVal
 
@@ -195,15 +235,8 @@ for i in range(0,len(bigram)):
     # storing the tag in order, in a list
     tagged_test_string.append(tagged)
 
-'''
-for i in range(0,(len(tagged_test_string)-2)):
-    currTag=nltk.tag.str2tuple(tagged_test_string[i])[1]
-    nextTag=nltk.tag.str2tuple(tagged_test_string[i+1])[1]
-    if(i>0):
-        prevTag=nltk.tag.str2tuple(tagged_test_string[i-1])[1]
-    currWord=nltk.tag.str2tuple(tagged_test_string[i])[0]
-'''
 
+#Set of rules after analyzing confusion matrix 
 for i in range(0,(len(tagged_test_string)-2)):
     currTag=nltk.tag.str2tuple(tagged_test_string[i])[1]
     nextTag=nltk.tag.str2tuple(tagged_test_string[i+1])[1]
@@ -211,32 +244,39 @@ for i in range(0,(len(tagged_test_string)-2)):
         prevTag=nltk.tag.str2tuple(tagged_test_string[i-1])[1]
     currWord=nltk.tag.str2tuple(tagged_test_string[i])[0]
     
+    #If the word is "a" and if the previous tags for the word does not denote
+    #end of sentences, then that word is a determiner.
+    
     if(currWord == 'a' and prevTag not in [',','.',':']):
         typeVal='DT'
         tagged=bigram[i]+'/'+typeVal
         tagged_test_string[i]=tagged
-
+    
+    #If the word is currently tagged as particle and if the word is not after different
+    #forms of verb then the word should be tagged as preposition or  subordinating conjunction.
+    
     elif(currTag == 'RP' and prevTag not in ["VB","VBD","VBG","VBN","VBZ","VBP"]):
         typeVal='IN'
         tagged=bigram[i]+'/'+typeVal
         tagged_test_string[i]=tagged
-        
-    elif(currTag == 'RP' and prevTag not in ["VB","VBD","VBG","VBN","VBZ","VBP"]):
-        typeVal='IN'
-        tagged=bigram[i]+'/'+typeVal
-        tagged_test_string[i]=tagged
-        
+    #If the word is currently tagged as verb and if the previous tag is determiner,
+    #then the word should be tagged as noun.
+               
     elif(currTag == 'VB' and prevTag == "DT"):
         typeVal='NN'
         tagged=bigram[i]+'/'+typeVal
         tagged_test_string[i]=tagged
+    
+    #If the word is currently tagged as Wh-determiner and if the previous tag is not
+    #a noun then the word should be a preposition or  subordinating conjunction.
+          
     elif(currTag == 'WDT' and prevTag not in ["NN","NNS",',']):
         typeVal='IN'
         tagged=bigram[i]+'/'+typeVal
         tagged_test_string[i]=tagged
  
 # writing the tagged_test_string to a text file
-with open(r'C:\Users\alaga\Desktop\sem 2\AIT690\POStag\pos-test-with-tags.txt', 'w') as f:
+with open(r'D:\bin\AIT-690\Assignments\Assignment-2\pos-test-with-tags.txt', 'w') as f:
     for item in tagged_test_string:
         f.write("%s\n" % item)
 
