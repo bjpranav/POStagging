@@ -1,6 +1,7 @@
-# -*- coding: utf-8 -*-
-
-
+'''
+Team GAP
+The scorer finds the accuracy and the confusion matrix of predicted and actual values. 
+'''
 # importing the packages
 import sys
 import nltk
@@ -16,6 +17,7 @@ predicted=sys.argv[1]
 key=sys.argv[2]
 '''
 # function to extract tags out of a given list
+#Parameter:tagged_text-predicted tag from tagger.py
 def extract_tags(tagged_text):
     only_tags = []
     for line in tagged_text:
@@ -26,6 +28,7 @@ def extract_tags(tagged_text):
     return only_tags
 
 # finding unique elements in a ordered fashion
+#parameter:list with non-unique values.
 def setz(sequence):
     seen = set()
     return [x for x in sequence if not (x in seen or seen.add(x))]
@@ -54,16 +57,18 @@ actual=extract_tags(tagged_testset_key.split())
 
 tags=setz(actual)
 
+#Initialize confusion matrix with zeroes.
 A = np.zeros((len(tags), len(tags)))
 confusion_matrix = pd.DataFrame(A, index=tags, columns=tags)
 
-
+#Builds the confusion matrix by incrementing values based on actual and predicted tags
 cnt=0
 for i in range(0,len(predicted)):
     if predicted[i]==actual[i]:
         cnt+=1
     confusion_matrix.at[predicted[i], actual[i]]=confusion_matrix.at[predicted[i], actual[i]] + 1
 
+#Calculates 
 accuracy=(cnt*100)/len(predicted)
 
     
@@ -73,8 +78,7 @@ with open('pos-tagging-report.txt', 'w') as f:
     f.write(confusion_matrix.to_string())
     
 #print("pos-tagging-report.txt")
-    
+#Stores the output in the file called pos-tagging-report.txt   
 print("pos-tagging-report.txt")
 print(accuracy)
 print(confusion_matrix)
-
