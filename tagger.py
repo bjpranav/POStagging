@@ -62,21 +62,33 @@ untagged_testset = untagged_testset.replace("[", "")
 untagged_testset = untagged_testset.replace("]", "")
 untagged_testset = untagged_testset.replace("\n", "")
 
-
+counterMe=0
+indexList=[]
 def tagged_word(prev,curr):
-    max_prob = []
+    
     if curr in taggedDict:
         n = len(taggedDict[bigram[i]])
-        unique = list(set(taggedDict[bigram[i]]))
-        for u in unique:
+        unique = []
+        for tag in taggedDict[bigram[i]]:
+            if tag not in unique:
+                unique.append(tag)
+                
+        list(set(taggedDict[bigram[i]]))
+        max_prob=0
+        for u in unique:         
             count_val = taggedDict[bigram[i]].count(u)
+            indexList.append(count_val)
             prob1 = count_val / single_tag_count[u]
             mer = prev + ' ' + u
             if mer in double_tag_count.keys():
                 prob2 = double_tag_count[mer] / single_tag_count[u]
                 total_prob = prob1 * prob2
-                max_prob.append(total_prob)
-                typeVal = unique[max_prob.index(max(max_prob))]
+                if(total_prob>max_prob):
+                    max_prob=total_prob
+                    tag=u
+                #max_prob.append(total_prob)
+                typeVal = tag
+                
 
             elif bigram[i] in taggedDict:
                 unique = list(set(taggedDict[bigram[i]]))
@@ -112,10 +124,10 @@ for i in range(0,len(bigram)):
             curr=bigram[i]
             prev,typeVal=tagged_word(prev,curr)
 
-
         else:
             curr = bigram[i]
             prev, typeVal = tagged_word(prev, curr)
+
     else:
         if bigram[i][0].isdigit()==True:
             typeVal = "CD"
@@ -152,11 +164,18 @@ for i in range(0,(len(tagged_test_string)-2)):
         prevTag=nltk.tag.str2tuple(tagged_test_string[i-1])[1]
     currWord=nltk.tag.str2tuple(tagged_test_string[i])[0]
     
+    '''
+    If the current word is "a" and if the previous tags are not ',','.' or ':' then
+    the word is a determiner
+    '''
     if(currWord == 'a' and prevTag not in [',','.',':']):
         typeVal='DT'
         tagged=bigram[i]+'/'+typeVal
         tagged_test_string[i]=tagged
-
+    
+    #If the current word is particle and if the previous tags are not ',','.' or ':' then
+    #the word is a determiner
+    
     elif(currTag == 'RP' and prevTag not in ["VB","VBD","VBG","VBN","VBZ","VBP"]):
         typeVal='IN'
         tagged=bigram[i]+'/'+typeVal
@@ -179,6 +198,10 @@ for i in range(0,(len(tagged_test_string)-2)):
 
 with open('pos-test-with-tags.txt', 'w') as f:
     for item in tagged_test_string:
+        f.write("%s\n" % item)
+        
+with open('indexList1.txt', 'w') as f:
+    for item in indexList:
         f.write("%s\n" % item)
 
 end = time.time()
