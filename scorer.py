@@ -25,13 +25,16 @@ def extract_tags(tagged_text):
         only_tags.append(tagTuples[1])
     return only_tags
 
+def setz(sequence):
+    seen = set()
+    return [x for x in sequence if not (x in seen or seen.add(x))]
 
 #predicted=open(predicted)
-predicted = open(r"C:\Users\alaga\Desktop\sem 2\AIT690\POStagging\pos-test-with-tags.txt")
+predicted = open(r"C:\Users\alaga\Desktop\sem 2\AIT690\POStag\pos-test-with-tags.txt")
 predicted=predicted.read()
 
 #tagged_testset_key= open(key)
-tagged_testset_key = open(r"C:\Users\alaga\Desktop\sem 2\AIT690\POStagging\pos-test-key.txt")
+tagged_testset_key = open(r"C:\Users\alaga\Desktop\sem 2\AIT690\POStag\pos-test-key.txt")
 tagged_testset_key=tagged_testset_key.read()
 
 tagged_testset_key = tagged_testset_key .replace("[", "")
@@ -44,7 +47,7 @@ tagged_testset_key= tagged_testset_key .replace("\n", "")
 predicted=extract_tags(predicted.split())
 actual=extract_tags(tagged_testset_key.split())
 
-tags=set(actual)
+tags=setz(actual)
 
 A = np.zeros((len(tags), len(tags)))
 confusion_matrix = pd.DataFrame(A, index=tags, columns=tags)
@@ -64,4 +67,6 @@ with open('pos-tagging-report.txt', 'w') as f:
     confusion_matrix.to_csv('pos-tagging-report.txt', header=True, index=True, sep='\t', mode='a')
     
 print("pos-tagging-report.txt")
+print(accuracy)
+print(confusion_matrix)
 

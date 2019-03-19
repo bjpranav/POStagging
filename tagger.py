@@ -10,7 +10,7 @@ import time
 
 start = time.time()
 #trainset = open(train)
-trainset = open(r"D:\bin\AIT-690\Assignments\Assignment-2\pos-train.txt")
+trainset = open(r"C:\Users\alaga\Desktop\sem 2\AIT690\POStag\pos-train.txt")
 tagged_trainset = trainset.read()
 
 # removing "[,],\n" which are not needed
@@ -54,7 +54,7 @@ for i in range(0,len(only_tags)):
 
 
 #testset = open(test)
-testset=open(r"D:\bin\AIT-690\Assignments\Assignment-2\\pos-test.txt")
+testset=open(r"C:\Users\alaga\Desktop\sem 2\AIT690\POStag\pos-test.txt")
 untagged_testset = testset.read()
 
 # TEXT cleaning, removing "[,],\n"
@@ -62,12 +62,16 @@ untagged_testset = untagged_testset.replace("[", "")
 untagged_testset = untagged_testset.replace("]", "")
 untagged_testset = untagged_testset.replace("\n", "")
 
+def setz(sequence):
+    seen = set()
+    return [x for x in sequence if not (x in seen or seen.add(x))]
+
 
 def tagged_word(prev,curr):
     max_prob = []
     if curr in taggedDict:
         n = len(taggedDict[bigram[i]])
-        unique = list(set(taggedDict[bigram[i]]))
+        unique = list(setz(taggedDict[bigram[i]]))
         for u in unique:
             count_val = taggedDict[bigram[i]].count(u)
             prob1 = count_val / single_tag_count[u]
@@ -79,7 +83,7 @@ def tagged_word(prev,curr):
                 typeVal = unique[max_prob.index(max(max_prob))]
 
             elif bigram[i] in taggedDict:
-                unique = list(set(taggedDict[bigram[i]]))
+                unique = list(setz(taggedDict[bigram[i]]))
                 max_val = taggedDict[bigram[i]].count(unique[0])
                 typeVal = unique[0]
                 for u in unique:
@@ -104,7 +108,7 @@ for i in range(0,len(bigram)):
 
     if bigram[i] in taggedDict:
 
-        if len(set(taggedDict[bigram[i]]))==1:
+        if len(setz(taggedDict[bigram[i]]))==1:
             typeVal=taggedDict[bigram[i]][0]
 
         elif i==0:
@@ -177,7 +181,7 @@ for i in range(0,(len(tagged_test_string)-2)):
         tagged_test_string[i]=tagged
  
 
-with open('pos-test-with-tags.txt', 'w') as f:
+with open(r'C:\Users\alaga\Desktop\sem 2\AIT690\POStag\pos-test-with-tags.txt', 'w') as f:
     for item in tagged_test_string:
         f.write("%s\n" % item)
 
@@ -185,3 +189,6 @@ end = time.time()
 runtime = end-start
 print("Run Time: ",runtime)
 print("pos-test-with-tags.txt")
+
+
+
