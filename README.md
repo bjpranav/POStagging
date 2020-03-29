@@ -1,4 +1,5 @@
-POS tagger by Team GAP
+POS tagger by Team GAP!
+
 Team Members: Pranav Krishna SJ,Alagappan A, Ganesh Nalluru
 
 This program learns to tag words based on the given train set which consists of tagged words and the
